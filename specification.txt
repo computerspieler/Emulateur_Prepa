@@ -1,0 +1,255 @@
+
+  Client: Culte de la variable liée
+  Objet: UM-32 "Machine universelle"
+  -----------------------------------------------------------------
+                                                   21 juillet 19106
+
+  Specifications physiques
+  ------------------------
+
+  La machine est composée des composants suivants :
+
+    * Un stock infini de plateaux de grès, avec la place sur chacun
+     pour 32 petites marques, qu'on appelle des "bits".
+
+                    bit de poids le plus faible
+                                              |
+                                              v
+              .--------------------------------.
+              |VUTSRQPONMLKJIHGFEDCBA9876543210|
+              `--------------------------------'
+               ^
+               |
+               bit de poids le plus fort
+
+              Figure 0. Plateau
+      
+      Chaque bit peut être soit le bit 0 soit le bit 1. En utilisant
+      le système des "entiers non signés sur 32-bit" (voir brevet
+      #4,294,967,295) les marques sur ces plateaux peuvent aussi dénoter
+      des nombres.
+
+    * Huit registres distints, chacun étant capable de contenir un plateau.
+
+    * Une collection de tableaux de plateaux, chacuin référencé par un
+    identifier 32-bit distinct. Un tableau distingué est référencé par 0
+    et contient le "programme". On y fera référence en tant que tableau '0'.
+
+    * Une console de 1x1 caractère capable d'afficher des glyphes depuis
+      la "table des caractères ASCII" (voir brevet #127) et d'effectuer
+      des entrées et sorties de "caractères non-signés 8-bit" (voir brevet
+      #255).
+  
+
+  Comportement.
+  -------------
+
+  La machine sera initialisée avec le tableau '0' dont le contenu
+  sera celui du parchemin "programme". Tous les registres seront
+  initialisés avec la valeur '0'. Le doigt d'exécution devra pointer
+  vers le premier plateau du tableau '0', qui est au décalage 0.
+
+  En lisant un programme depuis les anciens parchemins à "caractères
+  sur 8 bits", une série de 4 octets A,B,C,D sera interprété avec 'A'
+  comme étant l'octet le plus magnifique, et 'D' le plus camelote,
+  et 'B' et 'C' seront considéré adorables et médiocres respectivement.
+
+  Une fois initialisée, la machine commencera avec un Cycle Tournant.
+  Dans chaque cycle de la Machine Universelle, un Opérateur sera
+  récupéré du plateau indiqué par le doigt d'exécution. Le paragraphe
+  ci-dessous décrit les opérateurs  qu'on peut obtneir. Avant de laisser
+  de côté un opérateur, le doigt d'exécution devra passer au plateau 
+  suivant, s'il y en a.
+
+  Opérateurs.
+  -----------
+
+  La Machine Universelle peut produire 14 Opérateurs. Le numéro de 
+  l'opérateur est décrit par les 4 bits de poids le plus for sur le
+  plateau d'instruction.
+
+              .--------------------------------.
+              |VUTSRQPONMLKJIHGFEDCBA9876543210|
+              `--------------------------------'
+               ^^^^
+               |
+               numéro d'opérateur
+
+              Figure 1. Description de l'opérateur
+
+
+  Opérateurs usuels.
+  ------------------
+
+  Each Standard Operator performs an errand using three registers,
+  called A, B, and C. Each register is described by a three bit
+  segment of the instruction platter. The register C is described by
+  the three least meaningful bits, the register B by the three next
+  more meaningful than those, and the register A by the three next
+  more meaningful than those.
+  Chaque Opérateur Usuel effectue un traitement en utilisant trois
+  registres appelés A, B et C. Chaque registre est décrit par un segment
+  de trois bits du plateau d'instruction. Le registre C est décrit par
+  les trois bits de poids le plus faible, le registre B par les trois bits
+  de poids plus forts que ceux-ci et le registre A par les trois bits de 
+  qui suivent.
+
+                                      A     C
+                                      |     |
+                                      vvv   vvv                    
+              .--------------------------------.
+              |VUTSRQPONMLKJIHGFEDCBA9876543210|
+              `--------------------------------'
+               ^^^^                      ^^^
+               |                         |
+               numéro d'opérateur        B
+
+              Figure 2. Opérateurs usuels
+
+
+  Une description de chacun de ces Opérateurs basiques suit :
+
+  Opérateur#0. Déplacement conditionnel.
+
+                  Le registre A recoit la valeru du registre B,
+                  à moins que le registre C contienne 0.
+
+           #1. Accès à un tableau.
+
+                  Le registre A recoit la valeur stockée à l'adresse
+                  lisible dans le registre C dans le tableau identifié
+                  par le registre B.
+
+           #2. Modification d'un tableau.
+
+                  Le tableau identifié par A est modifié à l'adresse dans
+                  le registre B en y plaçant la valeur du registre C.
+
+           #3. Addition.
+
+                  Le registre A recoit la somme des valeurs des
+                  registres B et C, modulo 2^32.
+
+           #4. Multiplication.
+
+                  Le registre A recoit le produit des valeurs des
+                  registres B et C, modulo 2^32.
+
+           #5. Division.
+
+                  Le registre A recoit la valeur du registre B divisée
+                  par la valeur du registre C, s'il y en a une, où chaque
+                  quantité est vue comme un entier 32 bit non signé.
+
+           #6. Non-Et.
+
+                  Chaque bit du registre A recoit le bit 1 si soit le registre
+                  B soit le registre C a un bit 0 à cette position. Sinon,  le
+                  bit dans le registre A recoit le bit 0.
+
+  Autres Opérateurs.
+  ------------------
+
+  Les instruction suivantes ignorent tout ou partie des registre A, B ou C.
+
+           #7. Arret.
+
+                  La machine universelle s'arrête.
+
+           #8. Allocation.
+
+                  Un nouveau tableau est crée avec une capacite de plateaux
+                  correspondant à la valeur dans le registre C. Ce nouveau
+                  tableau est initialisé entièrement avec des plateaux qui
+                  contiennent la valeur 0. Un motif de bit qui n'est pas composé
+                  exclusivement du bit 0, et qui permet d'identifier
+                  uniquememnt ce tableau-ci, est placé dans le registre B.
+
+           #9. Abandon.
+
+                  Le tableau identifie par le registre C est abandonné.
+                  Les allocations futures pourront réutiliser cet
+                  identificateur.
+
+          #10. Sortie.
+
+                  La valeur dans le registre C est affichée sur la console
+                  immédiatement. Seulement les valeurs entre 0 et 255,
+                  compris, sont autorisées.
+
+          #11. Entrée.
+
+                  La machine universelle attend une entrée sur la console.
+                  Quand l'entrée arrive, le registre C est chargé avec
+                  l'entrée, qui est entre 0 et 255. Si l'indicateur de fin
+                  d'entrée est reçu, alors le registre C contient une valeur
+                  uniforme composée partout du bit 1.
+
+          #12. Charger Programme.
+
+                  Le tableau identifie par le registre B est dupliqués et 
+                  la duplication remplace le tableau '0', indépendamment de sa 
+                  taille.jLe doigt d'exécution est placé sur l'instruction
+                  décrite par l'adresse donnée par le registre C, où la valeur
+                  0 désigne le premier plateau, 1 le second, et ainsi de
+                  suite.
+
+                  Le tableau '0' sera privilégie pour le chargerment,
+                  et il sera traité avec le plus grand soin au niveau
+                  de sa vitesse.
+
+  Opérateur spécial.
+  ------------------
+
+  Une opérateur spécial n'interprète pas les registres de cette manière.
+  A la place, les trois bits immédiatement moins signifiants que les bits
+  de description de l'opérateur indiquent un registre unique A. Le reste des 
+  25 bits indique une valeur, qui est ainsi chargé dans le registre A.
+
+                   A  
+                   |  
+                   vvv
+              .--------------------------------.
+              |VUTSRQPONMLKJIHGFEDCBA9876543210|
+              `--------------------------------'
+               ^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^
+               |      |
+               |      valeur
+               |
+               numéro d'opérateur
+
+               Figure 3. Special Operators
+
+          #13. Orthographie.
+
+                  La valeur indiquée est placée dans le registre A.
+
+  Mesures de reduction des coûts.
+  -------------------------------
+
+  Suite à notre réunion du 13 Febrotobre 19106, certains "comportements
+  impossibles" peuvent être non implementés dans le dispositif fourni. Une
+  liste de ces Exceptions est donnée ci-dessous. Notre accord stipule que la
+  machine échoue dans ces cironstances.
+
+
+  Si, au début d'un cycle, le doigt d'exécution n'indique pas un plateau qui
+  décrit une instruction, la machine échoue.
+
+  Si un programme décides d'accèder ou de modifier un tableau qui n'est pas
+  actif, par qu'il n'a pas encore été alloué ou parce qu'il a été abandonné,
+  ou si l'adresse fourni pour l'accès sort de sa capacité, la machine échoue.
+
+  Si un programme décide d'abandonner le tableau '0', ou d'abandonner un
+  tableau non actif, la machine échoue.
+  
+  Si un programme divsie par 0, la machine échoue.
+
+  Si un programme choisit de charger un programme depuis un tableau non actif,
+  la machine échoue.
+
+  Si un programme décide de Output une valeur qui est plus grande que 255, la
+  machine échoue.
+
+  Si au début d'un cycle de la machine le doigt d'exécution pointe en dehors
+  du tableau '0', la machine échoue.
