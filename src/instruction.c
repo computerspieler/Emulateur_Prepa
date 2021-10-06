@@ -13,12 +13,20 @@ INSTRUCTION(0)
 
 INSTRUCTION(1)
 {
+	EtatMachine etat = verifierValiditeAdresse(machine, *registre_b, *registre_c);
+	if(etat != E_OK)
+		return etat;
+
 	*registre_a = machine->tableaux[*registre_b].plateaux[*registre_c];
 	return E_OK;
 }
 
 INSTRUCTION(2)
 {
+	EtatMachine etat = verifierValiditeAdresse(machine, *registre_a, *registre_b);
+	if(etat != E_OK)
+		return etat;
+
 	machine->tableaux[*registre_a].plateaux[*registre_b] = *registre_c;
 	return E_OK;
 }
@@ -66,7 +74,16 @@ INSTRUCTION(8)
 
 INSTRUCTION(9)
 {
-	detruireTableau(lireTableau(machine, *registre_c));
+	Tableau *tableau;
+	tableau = lireTableau(machine, *registre_c);
+
+	if(tableau == NULL)
+		return E_OUT_OF_BOUNDS;	
+
+	if(tableau->plateaux == NULL)
+		return E_ACCES_TABLEAU_INACTIF;
+
+	detruireTableau(tableau);
 	return E_OK;
 }
 
@@ -94,7 +111,20 @@ INSTRUCTION(11)
 
 INSTRUCTION(12)
 {
-	copierTableau(lireTableau(machine, 0), lireTableau(machine, *registre_b));
+	Tableau *tableau;
+
+	if(*registre_b != 0)
+	{
+		if(*registre_b >= machine->nb_tableaux)
+			return E_OUT_OF_BOUNDS;
+		
+		tableau = &machine->tableaux[*registre_b];
+		if(tableau->plateaux == NULL)
+			return E_OUT_OF_BOUNDS;
+
+		copierTableau(&machine->tableaux[0], tableau);
+	}
+	
 	machine->index_programme = *registre_c;
 	
 	return E_OK;

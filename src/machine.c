@@ -57,6 +57,7 @@ EtatMachine simulerCycle(Machine* machine)
 #endif
 
 	machine->index_programme ++;
+	machine->nb_cycles ++;
 	switch(opcode)
 	{
 	case 0:  return instruction0(machine, registre_a, registre_b, registre_c);
@@ -74,16 +75,12 @@ EtatMachine simulerCycle(Machine* machine)
 	case 12: return instruction12(machine, registre_a, registre_b, registre_c);
 	case 13:
 		registre_a = &machine->registres[instruction >> 25 & 0b0111];
-		instruction13(machine, registre_a, instruction & 0x01FFFFFF);
-		break;
+		return instruction13(machine, registre_a, instruction & 0x01FFFFFF);
 	
 	default:
 		return E_MAUVAISE_INSTRUCTION;
 	}
 
-	machine->nb_cycles ++;
-
-	return E_OK;
 }
 
 Tableau* lireTableau(Machine* machine, int index)
@@ -104,10 +101,10 @@ EtatMachine verifierValiditeAdresse(Machine* machine, int index_tableau, int ind
 	if(index_tableau >= machine->nb_tableaux)
 		return E_OUT_OF_BOUNDS;
 
-	if(machine->tableaux[index_tableau].plateaux == NULL)
+	tableau = &machine->tableaux[index_tableau];	
+	if(tableau->plateaux == NULL)
 		return E_ACCES_TABLEAU_INACTIF;
 
-	tableau = &machine->tableaux[index_tableau];	
 	if(index_plateau >= tableau->nb_plateaux)
 		return E_OUT_OF_BOUNDS;
 

@@ -7,8 +7,8 @@
 void initialiserTableau(Tableau* tableau, int nb_elements)
 {
 	tableau->nb_plateaux = nb_elements;
-
 	tableau->plateaux = calloc(nb_elements, sizeof(Plateau));
+
 	if(!tableau->plateaux)
 	{
 		perror("calloc");
@@ -18,12 +18,13 @@ void initialiserTableau(Tableau* tableau, int nb_elements)
 
 void detruireTableau(Tableau* tableau)
 {
-	if(tableau != NULL)
-	{
-		if(tableau->plateaux != NULL && tableau->nb_plateaux != 0)
-			free(tableau->plateaux);
-		memset(tableau, 0, sizeof(Tableau));
-	}
+	if(tableau == NULL)
+		return;
+
+	if(tableau->plateaux != NULL)
+		free(tableau->plateaux);
+
+	memset(tableau, 0, sizeof(Tableau));
 }
 
 void chargerTableau(Tableau* tableau, char* filename)
@@ -66,10 +67,11 @@ void copierTableau(Tableau* dest, Tableau* source)
 	if(!dest || !source)
 		return;
 
-	if(dest->nb_plateaux != source->nb_plateaux)
+	if(dest->nb_plateaux < source->nb_plateaux)
 	{
 		detruireTableau(dest);
 		initialiserTableau(dest, source->nb_plateaux);
 	}
+	dest->nb_plateaux = source->nb_plateaux;
 	memcpy(dest->plateaux, source->plateaux, source->nb_plateaux * sizeof(Plateau));
 }
