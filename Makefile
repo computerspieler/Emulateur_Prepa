@@ -6,11 +6,11 @@ CC=gcc
 CFLAGS=-c -Wno-unused-parameter -Isrc/ -Wall -Wextra
 
 CFLAGS:=$(CFLAGS) -g
-LDFLAGS=-g
+#LDFLAGS=-g
 #CFLAGS:=$(CFLAGS) -DDEBUG
 
-#CFLAGS:=$(CFLAGS) -O3
-#LDFLAGS=-O3
+CFLAGS:=$(CFLAGS) -O3
+LDFLAGS=-O3
 
 all: program
 

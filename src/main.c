@@ -10,22 +10,25 @@ void usage()
 
 int main(int argc, char* argv[])
 {
-	int i;
+	unsigned int i;
 	Machine machine;
+	EtatMachine etat;
 
 	if(argc != 2)
 	{
 		usage();
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	initialiserMachine(&machine);	
 	chargerTableau(&machine.tableaux[0], argv[1]);
 
-	while(simulerCycle(&machine) == E_OK);
-			
+	while((etat = simulerCycle(&machine)) == E_OK);
+
+	printf("Code de sortie : %i\n", etat);
+	
 	for(i = 0; i < machine.nb_tableaux; i++)
 		detruireTableau(&machine.tableaux[i]);
 
-	return 0;
+	return EXIT_SUCCESS;
 }

@@ -21,17 +21,15 @@ enum EtatMachine
 struct Machine
 {
 	Registre registres[8];
-	int index_programme;
-	int nb_cycles;
+	Registre index_programme;
+	unsigned int nb_cycles;
 
 	Tableau* tableaux;
-	int nb_tableaux;
+	unsigned int nb_tableaux;
 };
 
 void initialiserMachine(Machine* machine);
-void ajouterTableau(Machine* machine, int index);
+void ajouterTableau(Machine* machine, unsigned int index);
 EtatMachine simulerCycle(Machine* machine);
-EtatMachine verifierValiditeAdresse(Machine* machine, int index_tableau, int index_plateau);
-Tableau* lireTableau(Machine* machine, int index);
 
 #endif

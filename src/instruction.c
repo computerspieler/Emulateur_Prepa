@@ -13,9 +13,9 @@ INSTRUCTION(0)
 
 INSTRUCTION(1)
 {
-	EtatMachine etat = verifierValiditeAdresse(machine, *registre_b, *registre_c);
-	if(etat != E_OK)
-		return etat;
+	ASSERT_INDEX_TABLEAU_INVALIDE(machine, *registre_b);
+	ASSERT_TABLEAU_INACTIF(machine, *registre_b);
+	ASSERT_INDEX_PLATEAU_INVALIDE(machine, *registre_b, *registre_c);
 
 	*registre_a = machine->tableaux[*registre_b].plateaux[*registre_c];
 	return E_OK;
@@ -23,9 +23,9 @@ INSTRUCTION(1)
 
 INSTRUCTION(2)
 {
-	EtatMachine etat = verifierValiditeAdresse(machine, *registre_a, *registre_b);
-	if(etat != E_OK)
-		return etat;
+	ASSERT_INDEX_TABLEAU_INVALIDE(machine, *registre_a);
+	ASSERT_TABLEAU_INACTIF(machine, *registre_a);
+	ASSERT_INDEX_PLATEAU_INVALIDE(machine, *registre_a, *registre_b);
 
 	machine->tableaux[*registre_a].plateaux[*registre_b] = *registre_c;
 	return E_OK;
@@ -65,25 +65,21 @@ INSTRUCTION(7)
 
 INSTRUCTION(8)
 {
-	ajouterTableau(machine, machine->nb_tableaux);
-	initialiserTableau(&machine->tableaux[machine->nb_tableaux - 1], *registre_c);
-	*registre_b = machine->nb_tableaux - 1;
+	int index_tableau = machine->nb_tableaux;
+
+	ajouterTableau(machine, index_tableau);
+	initialiserTableau(&machine->tableaux[index_tableau], *registre_c);
+	*registre_b = index_tableau;
 	
 	return E_OK;
 }
 
 INSTRUCTION(9)
 {
-	Tableau *tableau;
-	tableau = lireTableau(machine, *registre_c);
+	ASSERT_INDEX_TABLEAU_INVALIDE(machine, *registre_c);
+	ASSERT_TABLEAU_INACTIF(machine, *registre_c);
 
-	if(tableau == NULL)
-		return E_OUT_OF_BOUNDS;	
-
-	if(tableau->plateaux == NULL)
-		return E_ACCES_TABLEAU_INACTIF;
-
-	detruireTableau(tableau);
+	detruireTableau(&machine->tableaux[*registre_c]);
 	return E_OK;
 }
 
@@ -111,18 +107,16 @@ INSTRUCTION(11)
 
 INSTRUCTION(12)
 {
-	Tableau *tableau;
-
+	/*
+	 *  Pas la peine de copier les tableaux si le 
+	 *  tableau de départ et d'arrivé sont les mêmes
+	 */
 	if(*registre_b != 0)
 	{
-		if(*registre_b >= machine->nb_tableaux)
-			return E_OUT_OF_BOUNDS;
-		
-		tableau = &machine->tableaux[*registre_b];
-		if(tableau->plateaux == NULL)
-			return E_OUT_OF_BOUNDS;
+		ASSERT_INDEX_TABLEAU_INVALIDE(machine, *registre_b);
+		ASSERT_TABLEAU_INACTIF(machine, *registre_b);
 
-		copierTableau(&machine->tableaux[0], tableau);
+		copierTableau(&machine->tableaux[0], &machine->tableaux[*registre_b]);
 	}
 	
 	machine->index_programme = *registre_c;

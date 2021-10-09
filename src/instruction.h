@@ -5,6 +5,18 @@
 
 #include "machine.h"
 
+#define ASSERT_INDEX_TABLEAU_INVALIDE(machine, index_tableau)	\
+	if(index_tableau >= machine->nb_tableaux)		\
+		return E_OUT_OF_BOUNDS;
+
+#define ASSERT_TABLEAU_INACTIF(machine, index_tableau)		\
+	if(machine->tableaux[index_tableau].plateaux == NULL)	\
+		return E_ACCES_TABLEAU_INACTIF;
+
+#define ASSERT_INDEX_PLATEAU_INVALIDE(machine, index_tableau, index_plateau)	\
+	if(index_plateau >= machine->tableaux[index_tableau].nb_plateaux)	\
+		return E_OUT_OF_BOUNDS;
+
 #define INSTRUCTION(instr_value)		\
 	EtatMachine instruction##instr_value(	\
 			Machine* machine,	\

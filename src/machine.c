@@ -11,31 +11,32 @@ void initialiserMachine(Machine* machine)
 	ajouterTableau(machine, 0);
 }
 
-void ajouterTableau(Machine* machine, int index)
+void ajouterTableau(Machine* machine, unsigned int index)
 {
 	if(index < machine->nb_tableaux)
 		return;
 
 	machine->nb_tableaux = index + 1;
 
-	machine->tableaux = reallocarray(machine->tableaux, machine->nb_tableaux, sizeof(Tableau));
+	if(machine->tableaux == NULL)
+		machine->tableaux = malloc(machine->nb_tableaux * sizeof(Tableau));
+	else
+		machine->tableaux = realloc(machine->tableaux, machine->nb_tableaux * sizeof(Tableau));
+
 	if(!machine->tableaux)
 	{
-		perror("reallocarray");
+		perror("realloc / malloc");
 		exit(EXIT_FAILURE);
 	}
 }
 
 EtatMachine simulerCycle(Machine* machine)
 {
-	EtatMachine etat_tmp;
 	Plateau instruction;
 	int opcode;
-/*
-	etat_tmp = verifierValiditeAdresse(machine, 0, machine->index_programme);
-	if(etat_tmp != E_OK)
-		return etat_tmp;
-*/
+
+	ASSERT_INDEX_PLATEAU_INVALIDE(machine, 0, machine->index_programme);
+
 	instruction = machine->tableaux[0].plateaux[machine->index_programme];
 
 	opcode = instruction >> 28 & 0b1111;
@@ -44,16 +45,32 @@ EtatMachine simulerCycle(Machine* machine)
  	Registre *registre_c = &machine->registres[instruction       & 0b0111];
 
 #ifdef DEBUG
-	printf("\nCycle n°%i: Instruction: %i, Arguments: ", machine->nb_cycles, opcode);
+	printf(
+		"Cycle n°%i: Instruction: %i, Arguments: ",
+		machine->nb_cycles,
+		opcode
+	);
 	if(opcode != 13)
-		printf("r%i, r%i, r%i", instruction >> 6 & 0b0111, instruction >> 3 & 0b0111, instruction & 0b0111);
+		printf(
+			"r%i, r%i, r%i",
+			instruction >> 6 & 0b0111,
+			instruction >> 3 & 0b0111,
+			instruction & 0b0111
+		);
 	else
-		printf("r%i, %i", instruction >> 25 & 0b0111, instruction & 0xFFFFFF);
+		printf(
+			"r%i, %i",
+			instruction >> 25 & 0b0111,
+			instruction & 0x1FFFFFF
+		);
 
 	printf("\nRegistres = [");
 	for(int i = 0; i < 8; i++)
 		printf("%x; ", machine->registres[i]);
-	printf("], Index Pointer: %i\n", machine->index_programme);
+	printf(
+		"], Index Pointer: %i\n",
+		machine->index_programme
+	);
 #endif
 
 	machine->index_programme ++;
@@ -83,30 +100,3 @@ EtatMachine simulerCycle(Machine* machine)
 
 }
 
-Tableau* lireTableau(Machine* machine, int index)
-{
-	if(index >= machine->nb_tableaux)
-		return NULL;
-
-	if(machine->tableaux[index].plateaux == NULL)
-		return NULL;
-
-	return &machine->tableaux[index];
-}
-
-EtatMachine verifierValiditeAdresse(Machine* machine, int index_tableau, int index_plateau)
-{
-	Tableau *tableau;
-
-	if(index_tableau >= machine->nb_tableaux)
-		return E_OUT_OF_BOUNDS;
-
-	tableau = &machine->tableaux[index_tableau];	
-	if(tableau->plateaux == NULL)
-		return E_ACCES_TABLEAU_INACTIF;
-
-	if(index_plateau >= tableau->nb_plateaux)
-		return E_OUT_OF_BOUNDS;
-
-	return E_OK;
-}

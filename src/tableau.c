@@ -29,7 +29,7 @@ void detruireTableau(Tableau* tableau)
 
 void chargerTableau(Tableau* tableau, char* filename)
 {
-	int i;
+	unsigned int i;
 	FILE* file;
 
 	if(!tableau)
@@ -52,6 +52,7 @@ void chargerTableau(Tableau* tableau, char* filename)
 		exit(EXIT_FAILURE);
 	}
 
+	// Change le boutisme de chaque plateau
 	for(i = 0; i < tableau->nb_plateaux; i++)
 		tableau->plateaux[i] =
 			((tableau->plateaux[i] >> 24 & 0xFF)      ) + 
